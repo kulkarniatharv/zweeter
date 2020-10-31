@@ -1,0 +1,37 @@
+{
+  "name": "zweeter",
+  "version": "1.0.0",
+  "description": "A twitter clone with GraphQL API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kulkarniatharv/zweeter.git"
+  },
+  "keywords": [
+    "zweeter",
+    "mern",
+    "stack",
+    "graphql"
+  ],
+  "author": "Atharv Kulkarni",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kulkarniatharv/zweeter/issues"
+  },
+  "homepage": "https://github.com/kulkarniatharv/zweeter#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "express": "^4.17.1",
+    "express-graphql": "^0.11.0",
+    "graphql": "^15.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}

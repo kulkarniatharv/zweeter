@@ -1,0 +1,9 @@
+{
+  "env": {
+    "AWS_HOST": "zweeter-db-instance.ce39vohobhpz.ap-south-1.rds.amazonaws.com",
+    "AWS_HOST_USER": "admin",
+    "AWS_HOST_PASSWORD": "HWr7QFpDRy945XCcb4Q0",
+    "AWS_DATABASE": "zweeterdb",
+    "TOKEN_SIGNING_KEY": "4hPyr3!f~`>D;cV[APUH"
+  }
+}
