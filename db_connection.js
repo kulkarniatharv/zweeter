@@ -17,7 +17,6 @@ db.connect((err) => {
 
 // return a promise of the query on the database
 const query = (query_to_execute) => {
-
   return new Promise((resolve, reject) => {
     db.query(query_to_execute, (err, result) => {
       if(err) {
@@ -30,7 +29,6 @@ const query = (query_to_execute) => {
 }
 
 const transaction_query = (query_to_execute) => {
-
   return new Promise((resolve, reject) => {
     db.query(query_to_execute, (err, result) => {
       if(err) {

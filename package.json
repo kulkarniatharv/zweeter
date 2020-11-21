@@ -25,6 +25,7 @@
   "homepage": "https://github.com/kulkarniatharv/zweeter#readme",
   "dependencies": {
     "bcrypt": "^5.0.0",
+    "easygraphql-format-error": "0.0.3",
     "express": "^4.17.1",
     "express-graphql": "^0.11.0",
     "graphql": "^15.3.0",

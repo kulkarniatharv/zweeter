@@ -11,12 +11,69 @@ module.exports = {
   addFollowing: async (args, req) => {
     // talking wrt me, so if i follow someone then add this person to my following list
     
+    /* STORED PROCEDURE FOR POPULATING THE USERFEED AFTER FOLLOWING SOMEONE
+    // DELIMITER //
+    // CREATE DEFINER=`admin`@`%` PROCEDURE `populate_userfeed_after_following`(IN username varchar(20), IN following_username varchar(20))
+    // BEGIN
+        
+    // SET @following_id = 0;
+    // SET @last_tweet = NULL;
+
+    // SET @followingId_tweet = CONCAT('SELECT id from users where username=\'', following_username, '\' into @following_id');
+    // SET @timestamp_tweet = CONCAT('SELECT min(timestamp) FROM userfeed_', username, ' into @last_tweet');
+
+    // PREPARE followingIdQuery FROM @followingId_tweet;
+    // EXECUTE followingIdQuery; 
+    // DEALLOCATE PREPARE followingIdQuery;
+
+    // PREPARE timestamp_tweetQuery FROM @timestamp_tweet;
+    // EXECUTE timestamp_tweetQuery; 
+    // DEALLOCATE PREPARE timestamp_tweetQuery;
+
+    // IF (@last_tweet is NULL) THEN
+    //   SET @insert_statement = CONCAT('INSERT INTO userfeed_', username, '(tweet_id) SELECT id from tweets
+    //   WHERE author=@following_id
+    //       LIMIT 200');
+    // ELSE
+    //       SET @insert_statement = CONCAT('INSERT INTO userfeed_', username, '(tweet_id) SELECT id from tweets
+    //   WHERE author=@following_id and timestamp > @last_tweet');
+    // END IF;
+
+    // PREPARE insertQuery FROM @insert_statement;
+    // EXECUTE insertQuery; 
+    // DEALLOCATE PREPARE insertQuery;
+
+    // SET @userfeed_tweets_count_after_following = 0;
+    // SET @getTweetsCount_after_following = CONCAT('Select count(*) from userfeed_', username , ' into @userfeed_tweets_count_after_following');
+
+    // PREPARE tweetsCount_after_following FROM @getTweetsCount_after_following;
+    // EXECUTE tweetsCount_after_following;
+    // DEALLOCATE PREAPARE tweetsCount_after_following;
+
+    // IF @userfeed_tweets_count_after_following > 200 then  
+    //   SET @deleteExtraTweets_after_following = CONCAT('DELETE FROM userfeed_', username , ' WHERE timestamp <= (
+    //       SELECT timestamp
+    //       FROM (
+    //         SELECT timestamp
+    //         FROM userfeed_', username, '
+    //         ORDER BY timestamp DESC
+    //         LIMIT 1 OFFSET 200
+    //       ) foo
+    //       )');
+        
+    //   PREPARE deleteExtraTweets_after_following FROM @deleteExtraTweets_after_following;
+    //   EXECUTE deleteExtraTweets_after_following;
+    //   DEALLOCATE PREAPARE deleteExtraTweets_after_following;
+    // END IF;
+
+    // END
+    // DELIMITER ; */
+
     if(!req.isAuth) {
-      throw new Error('Unauthenticated')
+      throw new Error(req.errorName.UNAUTHORIZED)
     }
 
     // begin transaction
-    let wasSuccess = false;
     return new Promise((resolve, reject) => {
       db.db.beginTransaction((err) => {
         if (err) {reject(err);}
@@ -38,7 +95,7 @@ module.exports = {
             sql: 'INSERT INTO followers VALUES (?,?)',
             values: [req.userId, followingDetails[0].id]
           };
-          console.log("insertFollowing_query")
+
           return db.transaction_query(insertFollowing_query);
         })
         .then((result) => {
@@ -47,7 +104,7 @@ module.exports = {
             sql: 'INSERT INTO following_count VALUES (?, 1) ON DUPLICATE KEY UPDATE following_count = following_count + 1',
             values: [req.userId]
           }
-          console.log("updateFollowingCount_query")
+
           return db.transaction_query(updateFollowingCount_query);
         })
         .then(result => {
@@ -58,6 +115,16 @@ module.exports = {
           }
   
           return db.transaction_query(updateFollowersCount_query);
+        })
+        .then(result => {
+          const populate_userfeed_following_query = {
+            sql: 'call populate_userfeed_after_following(?, ?)',
+            values: [req.username, args.username]
+          }
+
+          console.log(populate_userfeed_following_query);
+
+          return db.transaction_query(populate_userfeed_following_query);
         })
         .then(result => {
           db.db.commit((err) => {
@@ -81,7 +148,7 @@ module.exports = {
   removeFollowing: async (args, req) => {
     
     if(!req.isAuth) {
-      throw new Error('Unauthenticated')
+      throw new Error(req.errorName.UNAUTHORIZED)
     }
 
     return new Promise((resolve, reject) => {
@@ -147,7 +214,7 @@ module.exports = {
         })
         .catch(err => {
           console.log(err);
-          reject(new Error("Couldn't complete delete-like transaction."))
+          reject(new Error("Couldn't complete remove follower transaction."))
         });
 
       })

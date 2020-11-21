@@ -12,6 +12,15 @@ module.exports = buildSchema(`
     timestamp: String!
   }
 
+  type FeedTweet {
+    tweet: String!
+    username: String!
+    name: String!
+    timestamp: String!
+    num_likes: Int!
+    reply_count: Int!
+  }
+
   type UserTweets {
     tweets: [Tweet!]
     author_name: String!
@@ -36,6 +45,7 @@ module.exports = buildSchema(`
     users: [User!]!
     login(username: String!, password: String!): AuthData!
     userTweets(username: String!): UserTweets
+    getUserFeed(page: Int!): [FeedTweet]
   }
 
   input CreateUserInput {
@@ -57,7 +67,9 @@ module.exports = buildSchema(`
 
   type RootMutation {
     createUser(userInput: CreateUserInput!): String!
+    deleteUser(password: String!): Boolean!
     postTweet(userInput: PostTweetInput!): String!
+    postReply(reply: String!, parentId: ID!): Boolean!
     addFollowing(username: String!): Boolean!
     removeFollowing(username: String!): Boolean!
     addLike(userInput: AddLikeInput!): Boolean!

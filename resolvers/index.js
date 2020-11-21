@@ -3,6 +3,7 @@ const authResolver = require('./auth');
 const tweetsResolver = require('./tweets');
 const followersResolver = require('./followers');
 const likesResolver = require('./likes');
+const userfeedResolver = require('./userfeed');
 
 const rootResolver = {
   
@@ -10,7 +11,7 @@ const rootResolver = {
   ...tweetsResolver,
   ...followersResolver,
   ...likesResolver,
-
+  ...userfeedResolver,
   // query
 
   users: async () => {

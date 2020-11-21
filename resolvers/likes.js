@@ -5,7 +5,7 @@ module.exports = {
   addLike: async (args, req) => {
     
     if(!req.isAuth) {
-      throw new Error('Unauthenticated')
+      throw new Error(req.errorName.UNAUTHORIZED)
     }
 
     let type = 1;
@@ -20,14 +20,14 @@ module.exports = {
 
         let insertLike_query = {
           sql: `INSERT INTO likes (${!type ? 'tweet_id' : 'reply_id'}, liked_by, type) values (?, ?, ?)`,
-          values: !type ? [args.userInput.tweet_id, req.userId, type] : [args.userInput.reply_id, req.userId, type] 
+          values: !type ? [Number(args.userInput.tweet_id), req.userId, type] : [Number(args.userInput.reply_id), req.userId, type] 
         }
         
         db.transaction_query(insertLike_query)
         .then(result => {
           const updateLikeCount_query = {
             sql: `INSERT INTO likes_count (${!type ? 'tweet_id' : 'reply_id'}, num_likes, type) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE num_likes = num_likes + 1`,
-            values: !type ? [args.userInput.tweet_id, 1, type] : [args.userInput.reply_id, 1, type]
+            values: !type ? [Number(args.userInput.tweet_id), 1, type] : [Number(args.userInput.reply_id), 1, type]
           }
 
           return db.transaction_query(updateLikeCount_query);
@@ -53,7 +53,7 @@ module.exports = {
 
   removeLike: async (args, req) => {
     if(!req.isAuth) {
-      throw new Error('Unauthenticated')
+      throw new Error(req.errorName.UNAUTHORIZED)
     }
 
     let type = 1;
