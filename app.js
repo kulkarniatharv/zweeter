@@ -6,12 +6,12 @@ const apiResolver = require('./resolvers/index');
 const isAuth = require('./middleware/is-auth');
 
 // TODO:
-// * Store the user feed in userfeed_[username] table and when user requests for feed, populate the tweets and send them. Send 50 at a time
-// * send number of likes with every tweet; be it in userTweets or a feed tweets 
+// * Send 50 at a time while requesting userfeed.
 // * a retweet function
+// * when user posts a tweet, add it to his userfeed table
 
 // FIXME:
-// * likes, reply count are not getting updated properly.
+// 
 
 const app = express();
 const formatError = new FormatError();
@@ -44,6 +44,6 @@ app.use('/api', (req, res) => {
   })(req, res);
 });
 
-app.listen(process.env.PORT || '3000', () => {
-  console.log('server started on port 3000');
+app.listen(process.env.PORT || '8000', () => {
+  console.log('Server Started');
 });

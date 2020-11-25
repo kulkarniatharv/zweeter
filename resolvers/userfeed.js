@@ -87,7 +87,6 @@ module.exports = {
     // when the user posts a tweet then his followers' userfeed table will be updated to include this new tweet
     // removing the old tweet at the 200th position.
 
-    console.log("IN HERE");
     // const {page} = args;
 
     if(!req.isAuth) {
@@ -96,59 +95,46 @@ module.exports = {
 
     args.page = args.page % 4;
 
-    // SELECT t.tweet, u.username, concat(u.firstname, ' ', u.lastname) as name, t.timestamp, lc.num_likes
-    // FROM tweets t
-    // INNER JOIN users u
-    // ON t.author = u.id
-    // LEFT JOIN likes_count lc
-    // ON t.id = lc.tweet_id
-    // LEFT JOIN tweet_replies_count trc
-    // ON t.id = trc.id;
-
     let getUserFeed_query = {
-      sql: `call userfeed(?)`,
-      values: [req.username] 
+      sql: `call userfeed(?,?)`,
+      values: [req.username, req.userId] 
     }
 
     const result = await db.query(getUserFeed_query)
 
-    console.log("result ", result);
-    
     return result[0];
-    // return new Promise((resolve, reject) => {
-    //   db.db.beginTransaction((err) => {
-    //     if (err) {reject(err);}
-
-        
-        
-    //     db.transaction_query(getUserFeed_query)
-    //     .then(result => {
-    //       // const updateLikeCount_query = {
-    //       //   sql: `INSERT INTO likes_count (${!type ? 'tweet_id' : 'reply_id'}, num_likes, type) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE num_likes = num_likes + 1`,
-    //       //   values: !type ? [Number(args.userInput.tweet_id), 1, type] : [Number(args.userInput.reply_id), 1, type]
-    //       // }
-
-    //       // return db.transaction_query(updateLikeCount_query);
-    //       console.log(result)
-    //     })
-    //     .then(result => {
-    //       db.db.commit((err) => {
-    //         if(err) {
-    //           return db.db.rollback(function() {
-    //             throw err;
-    //           });
-    //         }
-    //         console.log("commited!")
-    //         resolve(true);
-    //       })
-    //     })
-    //     .catch(err => {
-    //       console.log(err);
-    //       reject(new Error("Couldn't complete like transaction."))
-    //     });
-    //   })
-    // })
 
   },
+
+  getUserDetail: async (args, req) => {
+    if(!req.isAuth) {
+      throw new Error(req.errorName.UNAUTHORIZED)
+    }
+
+    const userDetailQuery = {
+      sql: `SELECT u.id, concat(u.firstname, " ", u.lastname) as name, u.username, u.bio, followerC.num_followers as followers, followingC.following_count as following, count(t.id) as tweets_count
+            FROM users u
+            LEFT JOIN following_count followingC
+            ON u.id = followingC.user_id
+            LEFT JOIN followers_count followerC
+            ON u.id = followerC.user_id
+            LEFT JOIN tweets t
+            ON u.id = t.author
+            WHERE u.username = ?`,
+      values: [args.username === undefined ? req.username : args.username]
+    }
+
+    console.log(userDetailQuery);
+
+    try{
+      const userDetails = await db.query(userDetailQuery);
+      console.log(userDetails)
+      return userDetails;
+    }catch(err){
+      console.log(err);
+    }
+  }
+
+
 }
 

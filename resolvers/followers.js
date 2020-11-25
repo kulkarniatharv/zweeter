@@ -220,6 +220,28 @@ module.exports = {
       })
     })
 
+  },
+
+  isFollowing: async (args, req) => {
+    if(!req.isAuth) {
+      throw new Error(req.errorName.UNAUTHORIZED)
+    }
+
+    const query = {
+      sql: `SELECT user_id from followers where user_id=? and following_id=?`,
+      values: [req.userId, args.userId]
+    }
+
+    try{
+      const followingDetails = await db.query(query);
+
+      if (followingDetails.length !== 0){
+        return true
+      }
+      return false;
+    }catch (err){
+      console.log(err);
+    }
   }
 }
 

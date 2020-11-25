@@ -13,26 +13,30 @@ module.exports = buildSchema(`
   }
 
   type FeedTweet {
+    id: ID!
     tweet: String!
     username: String!
     name: String!
     timestamp: String!
-    num_likes: Int!
-    reply_count: Int!
+    num_likes: Int
+    reply_count: Int
+    liked_id: Int
   }
 
   type UserTweets {
-    tweets: [Tweet!]
-    author_name: String!
-    author_username: String!
+    tweets: [FeedTweet!]
+    name: String!
+    username: String!
   }
 
   type User {
     id: ID!
-    firstname: String! 
-    lastname: String!
+    name: String!
     username: String!
     bio: String
+    followers: Int
+    following: Int
+    tweets_count: Int!
   }
 
   type AuthData {
@@ -42,10 +46,11 @@ module.exports = buildSchema(`
   }
 
   type RootQuery {
-    users: [User!]!
+    getUserDetail(username: String): [User!]!
     login(username: String!, password: String!): AuthData!
-    userTweets(username: String!): UserTweets
+    userTweets(username: String): UserTweets
     getUserFeed(page: Int!): [FeedTweet]
+    isFollowing(userId: Int!): Boolean 
   }
 
   input CreateUserInput {
@@ -68,7 +73,7 @@ module.exports = buildSchema(`
   type RootMutation {
     createUser(userInput: CreateUserInput!): String!
     deleteUser(password: String!): Boolean!
-    postTweet(userInput: PostTweetInput!): String!
+    postTweet(userInput: PostTweetInput!): FeedTweet!
     postReply(reply: String!, parentId: ID!): Boolean!
     addFollowing(username: String!): Boolean!
     removeFollowing(username: String!): Boolean!
